@@ -27,7 +27,7 @@ installable apart from the others, for example because they need a dependency th
 ## Commands
 
 ```
-claude plugin validate . --strict             # the marketplace and each plugin
+claude plugin validate .                      # the marketplace and each plugin
 luacheck .                                    # the Lua scripts
 claude --plugin-dir plugins/dcs-missions      # a session with the working tree's plugin loaded
 ```
@@ -67,7 +67,8 @@ These steps are mandatory, whatever tools you work with.
    `.tracker/<type>-<slug>/spec.md` straight to `main` with `Status: in-progress`, then branch from
    that commit. The idea the work takes up, if any, leaves `IDEAS.md` in the same commit.
 3. **Branch** from an up-to-date `main`, named as *Git flow* says.
-4. **Validate and lint**: `claude plugin validate . --strict` and `luacheck .`. Run a script you
+4. **Validate and lint**: `claude plugin validate .`, with no warning but the missing
+   `version` (see *Versioning*), and `luacheck .`. Run a script you
    changed. Check a skill you changed as *Writing skills* says. When only DCS can show that advice
    is right, say so.
 5. **Commit** as *Git flow* says.
