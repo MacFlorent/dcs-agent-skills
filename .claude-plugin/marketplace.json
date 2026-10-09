@@ -13,8 +13,8 @@
     {
       "name": "dcs-hotload",
       "source": {
-        "source": "github",
-        "repo": "MacFlorent/dcs-hotload",
+        "source": "url",
+        "url": "https://github.com/MacFlorent/dcs-hotload.git",
         "ref": "v1.1.0"
       },
       "description": "Run Lua in a live DCS World mission through dcs-hotload, and set it up in a mission"

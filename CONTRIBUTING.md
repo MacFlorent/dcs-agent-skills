@@ -149,6 +149,9 @@ are the history.
 
 A marketplace entry for a plugin of another repository is pinned to one of its release tags
 (`"ref": "v<x.y.z>"`), so users only get a released version; moving the pin is a pull request here.
+It names the repository by its HTTPS URL (`"source": "url"`), not as `owner/repo` (`"source":
+"github"`): for the latter Claude Code may clone over SSH, which fails for anyone without a GitHub
+SSH key, even on a public repository.
 
 ## Writing guidance
 
