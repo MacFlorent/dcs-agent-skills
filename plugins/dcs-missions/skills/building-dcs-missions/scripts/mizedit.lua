@@ -286,7 +286,7 @@ recipe()
 
 local problems = {}
 local groupIds, unitIds, names = {}, {}, {}
-eachGroup(function(group, category, country, side)
+eachGroup(function(group, category, country)
   if groupIds[group.groupId] then problems[#problems + 1] = "duplicate groupId " .. group.groupId end
   groupIds[group.groupId] = true
   for _, unit in ipairs(group.units or {}) do
