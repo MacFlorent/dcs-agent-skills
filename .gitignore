@@ -1,0 +1,5 @@
+# Local working space: specs and plans before they become a .tracker/ spec.
+/.drafts/
+
+# Python bytecode from running the skills' scripts in place.
+__pycache__/

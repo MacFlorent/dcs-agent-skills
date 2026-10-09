@@ -1,0 +1,6 @@
+# LF everywhere, whatever the clone's core.autocrlf: the scripts run under Bash, Lua and Python on
+# any OS, and skills are read by agents that compare text.
+* text=auto eol=lf
+
+# Mission templates are zips saved by the DCS Mission Editor.
+*.miz binary

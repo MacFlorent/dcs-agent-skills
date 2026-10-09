@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Validate, lint and rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Every merge to main is a release (CONTRIBUTING.md), so a broken manifest must never land.
+      - name: Validate the marketplace and its plugins
+        run: npx --yes @anthropic-ai/claude-code plugin validate . --strict
+
+      - name: Install Lua 5.1 and luacheck
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y lua5.1 liblua5.1-0-dev luarocks
+          sudo luarocks --lua-version=5.1 install luacheck
+
+      - name: luacheck
+        run: luacheck .
+
+      - name: Python scripts compile
+        run: python3 -m compileall -q plugins
+
+      # Skills never name a runner (CONTRIBUTING.md, Writing skills).
+      - name: No runner named in a skill
+        run: |
+          if grep -rni hotload plugins; then
+            echo "::error::a skill names hotload"
+            exit 1
+          fi
