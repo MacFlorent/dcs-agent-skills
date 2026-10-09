@@ -25,14 +25,9 @@ jobs:
             exit 1
           fi
 
-      - name: Install Lua 5.1 and luacheck
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y lua5.1 liblua5.1-0-dev luarocks
-          sudo luarocks --lua-version=5.1 install luacheck
-
+      # The pinned luacheck binary, the same one a local run uses.
       - name: luacheck
-        run: luacheck .
+        run: bash scripts/lint.sh
 
       - name: Python scripts compile
         run: python3 -m compileall -q plugins

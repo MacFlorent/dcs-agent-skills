@@ -1,5 +1,8 @@
 # Local working space: specs and plans before they become a .tracker/ spec.
 /.drafts/
 
+# Lint tools, fetched at pinned versions by scripts/lint.sh.
+/.tools/
+
 # Python bytecode from running the skills' scripts in place.
 __pycache__/

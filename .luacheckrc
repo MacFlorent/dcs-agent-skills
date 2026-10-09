@@ -1,12 +1,10 @@
--- luacheck configuration. CI runs `luacheck .` from the repository root.
+-- luacheck configuration, read by scripts/lint.sh, locally and in CI.
 std = "lua51"
 max_line_length = 120
 
--- Runs in plain Lua 5.1 and hands the mission's tables to the recipe as globals. Its section
--- rulers are box-drawing characters, three bytes each, which a byte count takes for long lines.
+-- Runs in plain Lua 5.1 and hands the mission's tables to the recipe as globals.
 files["plugins/dcs-missions/skills/building-dcs-missions/scripts/mizedit.lua"] = {
   globals = { "mission", "options", "warehouses", "dictionary", "mapResource", "M" },
-  max_comment_line_length = false,
 }
 
 -- Runs inside a DCS mission.
