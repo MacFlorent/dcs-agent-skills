@@ -1,7 +1,7 @@
 {
   "name": "dcs-agent-skills",
   "description": "Agent skills for DCS World",
-  "owner": { "name": "MacFlorent" },
+  "owner": { "name": "Flogas" },
   "plugins": [
     {
       "name": "dcs-missions",
