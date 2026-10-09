@@ -8,7 +8,8 @@ from. This file holds every rule for changing it; `CLAUDE.md` only points here.
 - **Claude Code**, for `claude plugin validate` and to try a skill in a session.
 - **Python 3** and **Lua 5.1**, to run the skills' scripts. On Windows, *Lua for Windows* installs
   `C:\Program Files (x86)\Lua\5.1\lua.exe`.
-- **luacheck**, optional locally: CI runs it on every pull request.
+- **A Bash shell** (Git Bash on Windows) and `curl`, for `scripts/lint.sh`, which fetches luacheck
+  itself.
 - **DCS World**, for checks only the simulator can answer.
 
 ## Layout
@@ -18,6 +19,7 @@ from. This file holds every rule for changing it; `CLAUDE.md` only points here.
 | `.claude-plugin/marketplace.json` | the marketplace: one entry per plugin, here or in another repository |
 | `plugins/<plugin>/` | one plugin: `.claude-plugin/plugin.json` and `skills/` |
 | `plugins/<plugin>/skills/<skill>/` | one skill: `SKILL.md`, files it loads on demand, `scripts/`, `templates/` |
+| `scripts/lint.sh` | luacheck at a pinned version, downloaded into `.tools/` (git-ignored) |
 | `.tracker/` | work in progress and work done, and `IDEAS.md` — see *Tracking work* |
 | `.drafts/` | local working space, git-ignored |
 
@@ -27,8 +29,8 @@ installable apart from the others, for example because they need a dependency th
 ## Commands
 
 ```
-claude plugin validate . --strict             # the marketplace and each plugin
-luacheck .                                    # the Lua scripts
+claude plugin validate .                      # the marketplace and each plugin
+bash scripts/lint.sh                          # luacheck on the Lua scripts, as CI runs it
 claude --plugin-dir plugins/dcs-missions      # a session with the working tree's plugin loaded
 ```
 
@@ -67,7 +69,8 @@ These steps are mandatory, whatever tools you work with.
    `.tracker/<type>-<slug>/spec.md` straight to `main` with `Status: in-progress`, then branch from
    that commit. The idea the work takes up, if any, leaves `IDEAS.md` in the same commit.
 3. **Branch** from an up-to-date `main`, named as *Git flow* says.
-4. **Validate and lint**: `claude plugin validate . --strict` and `luacheck .`. Run a script you
+4. **Validate and lint**: `claude plugin validate .`, with no warning but the missing
+   `version` (see *Versioning*), and `bash scripts/lint.sh`. Run a script you
    changed. Check a skill you changed as *Writing skills* says. When only DCS can show that advice
    is right, say so.
 5. **Commit** as *Git flow* says.

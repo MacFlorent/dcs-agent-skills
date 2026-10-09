@@ -23,8 +23,8 @@ loaded.
 ## Commands
 
 ```
-claude plugin validate . --strict       # the marketplace and each plugin, as CI runs it
-luacheck .                              # as CI runs it
+claude plugin validate .                # the marketplace and each plugin, as CI runs it
+bash scripts/lint.sh                    # luacheck at its pinned version, as CI runs it
 ```
 
 ## Workflow

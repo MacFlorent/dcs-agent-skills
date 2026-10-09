@@ -1,0 +1,8 @@
+{
+  "name": "dcs-missions",
+  "description": "Build DCS World .miz files and write the Lua that runs inside a mission",
+  "author": { "name": "Flogas" },
+  "repository": "https://github.com/MacFlorent/dcs-agent-skills",
+  "license": "Apache-2.0",
+  "keywords": ["dcs", "dcs-world", "mission", "lua"]
+}

@@ -16,17 +16,18 @@ jobs:
       - uses: actions/checkout@v5
 
       # Every merge to main is a release (CONTRIBUTING.md), so a broken manifest must never land.
+      # Warnings fail too, except the missing version: these plugins have none on purpose.
       - name: Validate the marketplace and its plugins
-        run: npx --yes @anthropic-ai/claude-code plugin validate . --strict
-
-      - name: Install Lua 5.1 and luacheck
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y lua5.1 liblua5.1-0-dev luarocks
-          sudo luarocks --lua-version=5.1 install luacheck
+          npx --yes @anthropic-ai/claude-code plugin validate . | tee validate.log
+          if grep '❯' validate.log | grep -v 'version: No version specified'; then
+            echo "::error::claude plugin validate reported a warning"
+            exit 1
+          fi
 
+      # The pinned luacheck binary, the same one a local run uses.
       - name: luacheck
-        run: luacheck .
+        run: bash scripts/lint.sh
 
       - name: Python scripts compile
         run: python3 -m compileall -q plugins

@@ -1,6 +1,6 @@
 # The dcs-missions plugin and the marketplace
 
-Status: in-progress
+Status: done
 
 Builds this repository's first content: the `dcs-missions` plugin, from skills that lived
 untracked in the SkynetMunitionTests mission (`.claude/skills/`), and the marketplace that lists it.
@@ -188,3 +188,26 @@ needs to install alone).
   path (no path left pointing at SkynetMunitionTests).
 - With both plugins installed in a mission folder, "check that ground at x, y is fit for a SAM
   site" runs `placement-check.lua` through hotload without either skill naming the other.
+
+## Comments
+
+Decided while building:
+
+- **The `dcs-hotload` marketplace entry is not part of this work.** It needs a hotload release that
+  contains the plugin; it is an idea in `IDEAS.md` until then.
+- **Validation runs without `--strict`.** Strict mode turns the missing-version warning into an
+  error, and the plugins have no version on purpose. CI fails on any other warning.
+- **`miz.py` also reads `DCS_INSTALL`**, so a machine with DCS elsewhere sets it once instead of
+  passing `--dcs` to every command.
+- **The license file is `LICENSE.md`**, as in dcs-hotload.
+- **luacheck is fetched by `scripts/lint.sh`**, taken from Skynet-IADS: a pinned binary, the same
+  locally and in CI, with nothing to install.
+- **`facts.md` gained one line**, from the munition-test notes left behind: a unit out of
+  ammunition stays empty without a truck nearby. It is true of any mission.
+
+Checked: the recipe example in `building-dcs-missions` builds against DCS 2.9 from the plugin's
+folder; `claude plugin validate .` passes with only the version warning; no `hotload` under
+`plugins/`; in fresh headless sessions with the plugin loaded, a spawning-and-bombing script task
+picks `writing-dcs-scripts`, an SA-6 mission task picks `building-dcs-missions`, and an unrelated
+Python task picks neither. `scripts/lint.sh` (luacheck 1.2.0)
+is clean. Not checked: the placement check through a runner, anything in DCS beyond the build.
