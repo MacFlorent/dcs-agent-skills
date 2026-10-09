@@ -33,22 +33,6 @@ mission (`miz.py find '"triggerOnce"'`).
 `mission.groundControl.roles.instructor.<side>` = number of Game Master slots.
 `artillery_commander`, `forward_observer` and `observer` are the other Combined Arms roles.
 
-## Group tables at runtime
-
-`coalition.addGroup(countryId, Group.Category.GROUND | AIRPLANE | HELICOPTER | SHIP, group)` takes
-the group table the editor writes, minus what it computes: `groupId` and `unitId` are optional,
-a group or unit named like an existing one replaces it (a way to respawn), and `x`/`y`, `route`
-points, `task`, `payload`, `alt`, `speed` mean the same. A spawned group's controller is not
-ready at once: wait a few seconds before `setTask` or `setOption`. Hoggit wiki: "DCS func addGroup".
-
-Task tables are not stored the way the scripting API takes them: the file's Bombing task has
-`x`, `y`; `controller:setTask` wants `point = { x = ..., y = ... }`. Copy a runtime task from the
-wiki page of that task, not from a `.miz`.
-
-Commands and options a recipe sets on waypoint 1 (`M.invisible()`, `M.immortal()`,
-`M.option(id, value)`) are also available at runtime:
-`group:getController():setCommand({ id = "SetImmortal", params = { value = true } })`.
-
 ## Air groups
 
 - Air start: first waypoint `type = "Turning Point"`, with `alt`, `speed`; the unit carries the
@@ -57,10 +41,3 @@ Commands and options a recipe sets on waypoint 1 (`M.invisible()`, `M.immortal()
   `M_fuel_max`).
 - Main task (`task`) matches what the waypoint tasks do: `Ground Attack` for Bombing,
   `CAS`, `SEAD`, `CAP`, `Nothing`…
-
-## For the munition tests
-
-- The site under test immortal (`M.immortal()`) and the launching aircraft invisible
-  (`M.invisible()`), so the munition is the only thing in the site's volume.
-- A SAM site fires its loads and stops: put a supply truck of its side next to it.
-- One engagement at a time: several heavy engagements at once have frozen DCS.

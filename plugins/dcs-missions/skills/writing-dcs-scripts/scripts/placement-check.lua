@@ -1,8 +1,8 @@
 --[[
 placement-check.lua -- is the ground at a map point fit for a ground group? Runs inside DCS.
-Copy into the mission's dcs-hotload/user-lib/, then from an inbox command or a menu script:
+The file returns a function; load it in the running mission, then call it:
 
-  local check = Hotload.load("placement-check")
+  local check = dofile("<path>/placement-check.lua")
   return check({ { x = 25732, y = 454671 }, { x = -65000, y = 825000 } }, 150)
 
 For each point (map metres, x north, y east) and a radius in metres, returns the surface type at
