@@ -200,6 +200,8 @@ Decided while building:
 - **`miz.py` also reads `DCS_INSTALL`**, so a machine with DCS elsewhere sets it once instead of
   passing `--dcs` to every command.
 - **The license file is `LICENSE.md`**, as in dcs-hotload.
+- **luacheck is fetched by `scripts/lint.sh`**, taken from Skynet-IADS: a pinned binary, the same
+  locally and in CI, with nothing to install.
 - **`facts.md` gained one line**, from the munition-test notes left behind: a unit out of
   ammunition stays empty without a truck nearby. It is true of any mission.
 
@@ -207,5 +209,5 @@ Checked: the recipe example in `building-dcs-missions` builds against DCS 2.9 fr
 folder; `claude plugin validate .` passes with only the version warning; no `hotload` under
 `plugins/`; in fresh headless sessions with the plugin loaded, a spawning-and-bombing script task
 picks `writing-dcs-scripts`, an SA-6 mission task picks `building-dcs-missions`, and an unrelated
-Python task picks neither. Not checked: luacheck (not installed locally; CI runs it), the
-placement check through a runner, anything in DCS beyond the build.
+Python task picks neither. `scripts/lint.sh` (luacheck 1.2.0)
+is clean. Not checked: the placement check through a runner, anything in DCS beyond the build.
