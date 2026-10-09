@@ -16,8 +16,9 @@ The skills read names and formats from your DCS install rather than from memory,
 the Hoggit wiki documents the scripting API. They do not run anything in DCS: to act on a live
 mission, the agent needs a way to run Lua there, which these skills leave to you.
 
-The scripts of `building-dcs-missions` need **Python 3** and **Lua 5.1**, and find the DCS install
-in its usual places, or through the `DCS_INSTALL` environment variable.
+The scripts of `building-dcs-missions` need **Python 3** only: recipes are Python, and the `.miz`
+is read and written without Lua, keeping what a recipe does not change as it was. They find the
+DCS install in its usual places, or through the `DCS_INSTALL` environment variable.
 
 ## Install
 

@@ -24,6 +24,7 @@ loaded.
 
 ```
 claude plugin validate .                # the marketplace and each plugin, as CI runs it
+python -m unittest discover -s test     # the skills' scripts, as CI runs them
 bash scripts/lint.sh                    # luacheck at its pinned version, as CI runs it
 ```
 

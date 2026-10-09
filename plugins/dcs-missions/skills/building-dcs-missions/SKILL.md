@@ -5,7 +5,7 @@ description: Use when creating or editing a DCS World .miz file without the Miss
 
 # Building DCS missions
 
-A `.miz` is a zip of Lua tables. Build it from a mission the Mission Editor saved, with a Lua
+A `.miz` is a zip of Lua tables. Build it from a mission the Mission Editor saved, with a Python
 recipe run by `scripts/miz.py`; take every format and name from the DCS install, never from
 memory.
 
@@ -15,40 +15,47 @@ For Lua that runs inside the mission once it flies, use `writing-dcs-scripts`.
 ## Build
 
 ```bash
-python scripts/miz.py build TEMPLATE.miz recipe.lua OUT.miz     # checks, then writes
+python scripts/miz.py build TEMPLATE.miz recipe.py OUT.miz      # checks, then writes
 python scripts/miz.py find '"SetInvisible"' --lines 8           # shipped examples of anything
 python scripts/miz.py countries                                 # country ids
 python scripts/miz.py unpack OUT.miz dir                        # read what was written
 ```
 
-`scripts/` and `templates/` are in this skill's folder. The scripts need Python 3 and Lua 5.1, and read the DCS
-install: pass `--dcs <install>` or set `DCS_INSTALL` when it is not in a usual place.
+`scripts/` and `templates/` are in this skill's folder. The scripts need Python 3 only, and read
+the DCS install: pass `--dcs <install>` or set `DCS_INSTALL` when it is not in a usual place.
 
 **Template**: a mission saved empty by the Mission Editor on the right map. `templates/` holds
 `caucasus.miz` (saved by DCS 2.9.30). Another map needs its own: `warehouses` lists that map's
 airfields, so a template cannot be relabelled. Ask the user to save an empty mission on that map
 (New, pick the map, Save) and use it as the template.
 
-**Recipe** (helpers in `scripts/mizedit.lua`, documented at each function):
+**Recipe**: a Python file, run with the mission's tables as globals (`mission`, `options`,
+`warehouses`, `dictionary`, `mapResource`) and the helpers as `M` (in `scripts/mizedit.py`,
+documented at each function):
 
-```lua
+```python
 M.gameMaster(1, 1)
-M.addGroup{ side = "red", country = { id = 0, name = "Russia" }, category = "vehicle",
-  name = "SAM-SA6", x = 25732, y = 454671, tasks = { M.immortal() }, units = {
-    { type = "Kub 1S91 str" }, { type = "Kub 2P25 ln", dx = 100 }, { type = "Kub 2P25 ln", dy = 100 } } }
-local gbu = { CLSID = "{GBU-38}" }
-M.addGroup{ side = "blue", country = { id = 2, name = "USA" }, category = "plane", name = "MQ9",
-  x = -14268, y = 454671, alt = 5000, speed = 80, task = "Ground Attack", tasks = { M.invisible(), M.immortal() },
-  units = { { type = "MQ-9 Reaper", payload = { pylons = { gbu, gbu, gbu, gbu }, fuel = 1300,
-    flare = 0, chaff = 0, gun = 100 } } },
-  route = { { x = 15000, y = 454671, tasks = { M.bombing(23732, 454671, 14) } } } }
-M.onStart("scripts", { M.doScriptFile(M.embedFile("Scripts/my-script.lua")),
-  M.doScript([==[env.info("mission start")]==]) })
+M.addGroup(side="red", country={"id": 0, "name": "Russia"}, category="vehicle",
+           name="SAM-SA6", x=25732, y=454671, tasks=[M.immortal()], units=[
+               {"type": "Kub 1S91 str"}, {"type": "Kub 2P25 ln", "dx": 100}, {"type": "Kub 2P25 ln", "dy": 100}])
+gbu = {"CLSID": "{GBU-38}"}
+M.addGroup(side="blue", country={"id": 2, "name": "USA"}, category="plane", name="MQ9",
+           x=-14268, y=454671, alt=5000, speed=80, task="Ground Attack", tasks=[M.invisible(), M.immortal()],
+           units=[{"type": "MQ-9 Reaper", "payload": {"pylons": [gbu, gbu, gbu, gbu], "fuel": 1300,
+                                                      "flare": 0, "chaff": 0, "gun": 100}}],
+           route=[{"x": 15000, "y": 454671, "tasks": [M.bombing(23732, 454671, 14)]}])
+M.onStart("scripts", [M.doScriptFile(M.embedFile("Scripts/my-script.lua")),
+                      M.doScript('env.info("mission start")')])
 ```
 
 Map metres: `x` north, `y` east; headings in radians from north. `M.embedFile` reads a relative
 path from the recipe's folder. The build refuses duplicate ids or unit names, unknown unit types,
 a country id that does not match its name, and triggers naming missing files.
+
+The tables are dicts: a Lua array is a dict keyed `1..n`, and a number read from the file is a
+`luatable.Num` (text; `luatable.num()` gives its value). The helpers take lists; to put a list
+into a table yourself, convert it with `luatable.lua()`. Only the tables the recipe changes are
+rewritten, in the template's own layout; everything else is copied unchanged.
 
 The group table `M.addGroup` writes is also the one `coalition.addGroup` takes at runtime: see
 `writing-dcs-scripts`.

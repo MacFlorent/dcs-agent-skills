@@ -6,8 +6,7 @@ from. This file holds every rule for changing it; `CLAUDE.md` only points here.
 ## What you need
 
 - **Claude Code**, for `claude plugin validate` and to try a skill in a session.
-- **Python 3** and **Lua 5.1**, to run the skills' scripts. On Windows, *Lua for Windows* installs
-  `C:\Program Files (x86)\Lua\5.1\lua.exe`.
+- **Python 3**, to run the skills' scripts and the tests (standard library only).
 - **A Bash shell** (Git Bash on Windows) and `curl`, for `scripts/lint.sh`, which fetches luacheck
   itself.
 - **DCS World**, for checks only the simulator can answer.
@@ -20,6 +19,7 @@ from. This file holds every rule for changing it; `CLAUDE.md` only points here.
 | `plugins/<plugin>/` | one plugin: `.claude-plugin/plugin.json` and `skills/` |
 | `plugins/<plugin>/skills/<skill>/` | one skill: `SKILL.md`, files it loads on demand, `scripts/`, `templates/` |
 | `scripts/lint.sh` | luacheck at a pinned version, downloaded into `.tools/` (git-ignored) |
+| `test/` | the tests of the skills' scripts, Python `unittest`; `test/fixtures/` holds the missions they build from |
 | `.tracker/` | work in progress and work done, and `IDEAS.md` — see *Tracking work* |
 | `.drafts/` | local working space, git-ignored |
 
@@ -30,6 +30,7 @@ installable apart from the others, for example because they need a dependency th
 
 ```
 claude plugin validate .                      # the marketplace and each plugin
+python -m unittest discover -s test          # the skills' scripts
 bash scripts/lint.sh                          # luacheck on the Lua scripts, as CI runs it
 claude --plugin-dir plugins/dcs-missions      # a session with the working tree's plugin loaded
 ```
@@ -55,6 +56,12 @@ not how it came to be known.
   the skill contains: an agent decides from the description alone.
 - **`SKILL.md` stays short**; detail goes into a file it names and the agent opens when needed.
 
+A script changed is a test changed: `test/` checks the `.miz` reader and writer, the recipe
+helpers against missions built by the former Lua path (`test/fixtures/*/lua-built.miz`), and that
+`SKILL.md` shows the example the tests build. After changing the reader or writer, also run the
+round trip over every mission DCS ships (about a minute and a half):
+`DCS_AGENT_SKILLS_TEST_SHIPPED_MISSIONS=1 python -m unittest discover -s test`.
+
 To check a skill, start a fresh session with the working tree's plugin loaded (see *Commands*) and
 give it a task the skill should handle, without naming the skill: the skill must load from its
 description, and the agent must follow it. Then a task close to it that it should not handle.
@@ -69,7 +76,7 @@ These steps are mandatory, whatever tools you work with.
    `.tracker/<type>-<slug>/spec.md` straight to `main` with `Status: in-progress`, then branch from
    that commit. The idea the work takes up, if any, leaves `IDEAS.md` in the same commit.
 3. **Branch** from an up-to-date `main`, named as *Git flow* says.
-4. **Validate and lint**: `claude plugin validate .`, with no warning but the missing
+4. **Test, validate and lint**: `python -m unittest discover -s test`, `claude plugin validate .`, with no warning but the missing
    `version` (see *Versioning*), and `bash scripts/lint.sh`. Run a script you
    changed. Check a skill you changed as *Writing skills* says. When only DCS can show that advice
    is right, say so.

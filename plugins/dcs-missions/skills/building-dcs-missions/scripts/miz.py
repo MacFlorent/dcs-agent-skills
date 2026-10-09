@@ -1,8 +1,9 @@
 """miz.py -- build, unpack and pack DCS .miz files. Python 3 standard library only.
 
-  python miz.py build TEMPLATE.miz RECIPE.lua OUT.miz [--dcs DCS_INSTALL] [--lua LUA]
-      Unpack TEMPLATE, run RECIPE through mizedit.lua (next to this file), check every unit
-      type and country against the DCS install, pack OUT. Nothing is written when a check fails.
+  python miz.py build TEMPLATE.miz RECIPE.py OUT.miz [--dcs DCS_INSTALL]
+      Run the Python RECIPE on TEMPLATE's tables (mizedit.py, next to this file), check every
+      unit type and country against the DCS install, write OUT. Nothing is written when a check
+      fails. Only the tables the recipe changed are rewritten; the rest of TEMPLATE is copied.
   python miz.py find TEXT [--lines N] [--max M] [--dcs DCS_INSTALL]
       List the missions shipped with DCS whose `mission` table contains TEXT (a unit type, a task
       id such as "SetInvisible", a field name), with the matching line and the N lines after it:
@@ -22,15 +23,15 @@ locations that exists.
 import argparse
 import os
 import re
-import shutil
-import subprocess
 import sys
-import tempfile
 import zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import mizedit  # noqa: E402
+from luatable import FormatError  # noqa: E402
+
 HERE = Path(__file__).resolve().parent
-LUA_CANDIDATES = ["lua5.1", "lua", r"C:\Program Files (x86)\Lua\5.1\lua.exe"]
 DCS_CANDIDATES = [r"E:\DCS World", r"C:\Program Files\Eagle Dynamics\DCS World",
                   r"D:\DCS World", r"C:\Program Files\Eagle Dynamics\DCS World OpenBeta"]
 COUNTRY_LINE = re.compile(
@@ -48,14 +49,6 @@ def pack(folder, miz):
         for path in sorted(folder.rglob("*")):
             if path.is_file():   # files only, forward slashes: as the Mission Editor writes them
                 z.write(path, path.relative_to(folder).as_posix())
-
-
-def find_lua(explicit):
-    for cand in ([explicit] if explicit else LUA_CANDIDATES):
-        exe = shutil.which(cand) or (cand if Path(cand).is_file() else None)
-        if exe:
-            return exe
-    sys.exit("no Lua 5.1 found; pass --lua")
 
 
 def find_dcs(explicit):
@@ -116,35 +109,35 @@ def find(args):
         print("no shipped mission contains", repr(args.text))
 
 
+def check_units(units, types, country_ids):
+    """Problems with the units' types and countries, against the DCS install's names."""
+    problems = []
+    unknown = sorted({u.type for u in units if u.type not in types})
+    if unknown:
+        problems.append("unknown unit types (check spelling against Scripts/Database/db_countries.lua): "
+                        + ", ".join(unknown))
+    wrong = sorted({f"id {u.country_id} is {country_ids.get(u.country_id, 'no country')}, not {u.country_name}"
+                    for u in units if country_ids.get(u.country_id) != u.country_name})
+    if wrong:
+        problems.append("country id and name disagree (python miz.py countries): " + "; ".join(wrong))
+    return problems
+
+
 def build(args):
-    lua = find_lua(args.lua)
-    with tempfile.TemporaryDirectory() as tmp:
-        unpack(args.template, tmp)
-        run = subprocess.run([lua, str(HERE / "mizedit.lua"), tmp, args.recipe],
-                             capture_output=True, text=True)
-        if run.returncode != 0:
-            sys.exit(run.stderr.strip())
-        # TYPE <type> <country id> <country name> <category> <group>
-        units = [line.split("\t")[1:] for line in run.stdout.splitlines()
-                 if line.startswith("TYPE\t")]
-        dcs = find_dcs(args.dcs)
-        if dcs is None:
-            print("WARNING: DCS install not found (--dcs); unit types and countries NOT checked")
-        else:
-            types = known_types(dcs)
-            unknown = sorted({u[0] for u in units if u[0] not in types})
-            if unknown:
-                sys.exit("not written: unknown unit types (check spelling against "
-                         "Scripts/Database/db_countries.lua): " + ", ".join(unknown))
-            ids = countries(dcs)
-            wrong = sorted({f"id {u[1]} is {ids.get(int(u[1]), 'no country')}, not {u[2]}"
-                            for u in units if ids.get(int(u[1])) != u[2]})
-            if wrong:
-                sys.exit("not written: country id and name disagree "
-                         "(python miz.py countries): " + "; ".join(wrong))
-            print(f"unit types and countries checked against {dcs}")
-        pack(tmp, args.out)
-    print(f"wrote {args.out}: {len(units)} units")
+    try:
+        b = mizedit.build(args.template, args.recipe)
+    except (mizedit.RecipeError, FormatError) as e:
+        sys.exit(str(e))
+    dcs = find_dcs(args.dcs)
+    if dcs is None:
+        print("WARNING: DCS install not found (--dcs); unit types and countries NOT checked")
+    else:
+        problems = check_units(b.units, known_types(dcs), countries(dcs))
+        if problems:
+            sys.exit("not written: " + "\n  ".join(problems))
+        print(f"unit types and countries checked against {dcs}")
+    b.write(args.out)
+    print(f"wrote {args.out}: {len(b.units)} units")
 
 
 def main():
@@ -155,7 +148,6 @@ def main():
     b.add_argument("recipe")
     b.add_argument("out")
     b.add_argument("--dcs")
-    b.add_argument("--lua")
     f = sub.add_parser("find")
     f.add_argument("text")
     f.add_argument("--lines", type=int, default=0)
