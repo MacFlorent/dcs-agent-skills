@@ -1,0 +1,1 @@
+-- stand-in for iads-setup.lua

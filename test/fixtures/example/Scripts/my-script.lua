@@ -1,0 +1,1 @@
+env.info("my-script")
