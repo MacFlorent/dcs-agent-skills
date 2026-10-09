@@ -15,8 +15,12 @@
 
 A .miz is a zip of Lua tables: mission, options, warehouses, theatre, l10n/DEFAULT/dictionary,
 l10n/DEFAULT/mapResource, plus embedded files under l10n/DEFAULT/.
+
+The DCS install is --dcs, else the DCS_INSTALL environment variable, else the first of the usual
+locations that exists.
 """
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -55,6 +59,7 @@ def find_lua(explicit):
 
 
 def find_dcs(explicit):
+    explicit = explicit or os.environ.get("DCS_INSTALL")
     for cand in ([explicit] if explicit else DCS_CANDIDATES):
         if cand and (Path(cand) / "Scripts" / "Database").is_dir():
             return Path(cand)
@@ -62,7 +67,7 @@ def find_dcs(explicit):
 
 
 def need_dcs(explicit):
-    return find_dcs(explicit) or sys.exit("DCS install not found; pass --dcs")
+    return find_dcs(explicit) or sys.exit("DCS install not found; pass --dcs or set DCS_INSTALL")
 
 
 def countries(dcs):
