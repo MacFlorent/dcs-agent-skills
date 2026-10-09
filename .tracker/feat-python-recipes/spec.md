@@ -1,6 +1,6 @@
 # Python recipes, without Lua
 
-Status: in-progress
+Status: done
 
 ## Problem
 
@@ -61,3 +61,26 @@ This repository has none yet; they go to `test/`, Python `unittest`, run by CI.
 - Porting the recipes of missions that use this skill: the SkynetMunitionTests recipe stays on its
   own copy of the old skill until that project moves to the plugin.
 - Sharing the table code with dcs-hotload as a package.
+
+## Comments
+
+Decided while building:
+
+- **The writer also follows how a file writes its own table when empty.** DCS 2.9.30 writes an
+  empty `mapResource` as `mapResource = {}`; 88 shipped missions write it as an open pair, even
+  where their nested empty tables are `{}`. dcs-hotload's copy of the writer lacks this; it only
+  writes `mission`, which is never empty.
+- **The round trip covers every table a build may rewrite**: 4,746 tables in the 951 missions DCS
+  ships come back as the same text. One dictionary was edited by hand after the Mission Editor
+  (`["key"]= "x"`): its values come back the same, its spacing normalized. Translations under
+  other `l10n/` folders, some with Windows line endings, are never rewritten.
+- **Recipes get `luatable` as a global**, for direct edits (`Num`, `num()`, `lua()`).
+- **A test keeps `SKILL.md`'s example identical to the golden recipe**, so the documented example
+  is the tested one.
+- Deliberate breaks of the helpers and the writer, nine of them, each fail the tests but one:
+  rewriting a table the recipe did not change, which gives the same bytes and cannot be observed.
+
+Checked: `python -m unittest discover -s test` (24 tests), the shipped-missions round trip, both
+golden recipes and a misspelled unit type through `miz.py build` against DCS 2.9.30's install,
+luacheck, `claude plugin validate .`. Not tried in DCS: the Python-built missions, which hold the
+same tables as the Lua-built ones.

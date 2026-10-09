@@ -32,6 +32,9 @@ jobs:
       - name: Python scripts compile
         run: python3 -m compileall -q plugins
 
+      - name: Tests of the skills' scripts
+        run: python3 -m unittest discover -s test
+
       # Skills never name a runner (CONTRIBUTING.md, Writing skills).
       - name: No runner named in a skill
         run: |
