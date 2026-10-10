@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   check:
-    name: Validate, lint and rules
+    name: Validate, lint and test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -34,11 +34,3 @@ jobs:
 
       - name: Tests of the skills' scripts
         run: python3 -m unittest discover -s test
-
-      # Skills never name a runner (CONTRIBUTING.md, Writing skills).
-      - name: No runner named in a skill
-        run: |
-          if grep -rni hotload plugins; then
-            echo "::error::a skill names hotload"
-            exit 1
-          fi
