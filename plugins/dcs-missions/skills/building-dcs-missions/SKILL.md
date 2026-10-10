@@ -1,6 +1,6 @@
 ---
 name: building-dcs-missions
-description: Use when creating or editing a DCS World .miz file without the Mission Editor — placing SAM sites, EW radars, aircraft with payloads, ships, Game Master slots, mission-start triggers, embedded scripts — or when choosing where on the map to put ground units.
+description: Use when building, creating or editing a DCS World mission (a .miz file) — placing SAM sites, EW radars, aircraft with payloads, ships, Game Master slots, mission-start triggers, embedded scripts — or when choosing where on the map to put ground units.
 ---
 
 # Building DCS missions
