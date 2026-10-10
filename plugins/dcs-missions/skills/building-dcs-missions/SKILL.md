@@ -15,14 +15,16 @@ For Lua that runs inside the mission once it flies, use `writing-dcs-scripts`.
 ## Build
 
 ```bash
-python scripts/miz.py build TEMPLATE.miz recipe.py OUT.miz      # checks, then writes
-python scripts/miz.py find '"SetInvisible"' --lines 8           # examples in DCS's own missions
-python scripts/miz.py countries                                 # country ids
-python scripts/miz.py unpack OUT.miz dir                        # read what was written
+python scripts/miz.py build TEMPLATE.miz recipe.py OUT.miz --dcs DCS     # checks, then writes
+python scripts/miz.py find '"SetInvisible"' --lines 8 --dcs DCS          # examples in DCS's own missions
+python scripts/miz.py countries --dcs DCS                                # country ids
+python scripts/miz.py unpack OUT.miz dir                                 # read what was written
 ```
 
-`scripts/` and `templates/` are in this skill's folder. The scripts need Python 3 only, and read
-the DCS install: pass `--dcs <install>` or set `DCS_INSTALL` when it is not in a usual place.
+`scripts/` and `templates/` are in this skill's folder. The scripts need Python 3 only. `DCS` is
+the DCS World folder: find it once and pass it to every command. On Windows, the installer records
+it as `Path` under the registry key `HKCU\Software\Eagle Dynamics\DCS World` (seen with DCS
+2.9.30); check that the folder holds `Scripts/Database`. When it does not, ask the user.
 
 **Template**: a mission saved empty by the Mission Editor on the right map. `templates/` holds
 `caucasus.miz` (saved by DCS 2.9.30). Another map needs its own: `warehouses` lists that map's

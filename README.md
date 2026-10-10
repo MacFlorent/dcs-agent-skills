@@ -20,8 +20,8 @@ below, is one.
 `building-dcs-missions` builds a `.miz` from a template, an empty mission saved by the Mission
 Editor, and a recipe: a short Python script, written by the agent, that lists what to add or
 change (groups, payloads, triggers). Its scripts need **Python 3** only: the `.miz` is read and
-written without Lua, keeping what the recipe does not change as it was. They find the DCS install
-in its usual places; elsewhere, set a `DCS_INSTALL` environment variable to its folder.
+written without Lua, keeping what the recipe does not change as it was. They read the DCS install
+at the folder the agent passes them, which the skill tells it how to find.
 
 ### dcs-hotload
 
