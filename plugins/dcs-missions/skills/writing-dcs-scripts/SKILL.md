@@ -50,9 +50,8 @@ on waypoint 2, or pushed with `controller:pushTask` after the spawn delay, execu
 ## Payloads, flags and type names
 
 Recalled CLSIDs, weapon flags and unit type names may be wrong, and fail silently: a jet spawns
-unarmed, a unit is skipped. Look them up — the install files `building-dcs-missions` lists, the
-wiki for flags, or `list_payloads` / `list_unit_types` when the veaf-mission-editor MCP server is
-connected — and check `unit:getAmmo()` after spawning.
+unarmed, a unit is skipped. Look them up in the install files `building-dcs-missions` lists, or
+the wiki for flags, and check `unit:getAmmo()` after spawning.
 
 ## Events, timers and cleanup
 
@@ -68,15 +67,16 @@ connected — and check `unit:getAmmo()` after spawning.
   from the mission. The usual edit unlocks `io` and `lfs` only: no clock, no file rename or delete.
   It is install-wide, affects every mission including multiplayer, and DCS updates revert it.
 - A mission loads Lua at start through trigger actions: DO SCRIPT (text) and DO SCRIPT FILE (a file
-  embedded in the `.miz`). `dofile` names a chunk with the plain path, no `@`.
-- F10 menus (`missionCommands`) show at most 10 entries per level and do not page; a 13th entry
-  breaks the menu.
+  embedded in the `.miz`); `building-dcs-missions` writes them.
+- A script that finds its own folder from `debug.getinfo(1, "S").source` must accept the path with
+  or without Lua's leading `@`: under DCS's `dofile` it may come without.
+- F10 menus (`missionCommands`) show at most 10 entries per level and do not page.
 - `dcs.log` (`Saved Games\DCS\Logs`) timestamps are UTC.
 
 ## Measured behaviour
 
-[facts.md](facts.md): what the wiki does not say, measured in DCS — observing a munition in
-flight, how ground units rearm. Read it before measuring weapons or engagements.
+`facts.md`, next to this file: what the wiki does not say, measured in DCS — observing a munition
+in flight, how ground units rearm. Read it before measuring weapons or engagements.
 
 ## Checking ground for a unit
 

@@ -1,22 +1,22 @@
 ---
 name: building-dcs-missions
-description: Use when creating or editing a DCS World .miz file without the Mission Editor or VEAF tools — placing SAM sites, EW radars, aircraft with payloads, ships, Game Master slots, mission-start triggers, embedded scripts — or when choosing where on the map to put ground units.
+description: Use when creating or editing a DCS World .miz file without the Mission Editor — placing SAM sites, EW radars, aircraft with payloads, ships, Game Master slots, mission-start triggers, embedded scripts — or when choosing where on the map to put ground units.
 ---
 
 # Building DCS missions
 
-A `.miz` is a zip of Lua tables. Build it from a mission the Mission Editor saved, with a Python
-recipe run by `scripts/miz.py`; take every format and name from the DCS install, never from
-memory.
+A `.miz` is a zip of Lua tables. Build it from a template, a mission the Mission Editor saved, and
+a recipe: a Python script you write that lists what to add or change. `scripts/miz.py` runs the
+recipe on the template and checks the result. Take every format and name from the DCS install,
+never from memory.
 
-For VEAF missions (a `mission.yaml`, VEAF aliases, combat zones), use `veaf-mission-authoring`.
 For Lua that runs inside the mission once it flies, use `writing-dcs-scripts`.
 
 ## Build
 
 ```bash
 python scripts/miz.py build TEMPLATE.miz recipe.py OUT.miz      # checks, then writes
-python scripts/miz.py find '"SetInvisible"' --lines 8           # shipped examples of anything
+python scripts/miz.py find '"SetInvisible"' --lines 8           # examples in DCS's own missions
 python scripts/miz.py countries                                 # country ids
 python scripts/miz.py unpack OUT.miz dir                        # read what was written
 ```
@@ -48,6 +48,13 @@ M.onStart("scripts", [M.doScriptFile(M.embedFile("Scripts/my-script.lua")),
                       M.doScript('env.info("mission start")')])
 ```
 
+**Embed a script, or load it from disk.** `M.doScriptFile(M.embedFile(...))` copies it into the
+`.miz`: it travels with the mission, and an edit needs a rebuild and a re-open (Restart replays the
+old copy). `M.doScript('assert(loadfile([[C:/path/to/script.lua]]))()')` reads it from disk each
+time the mission starts: an edit is live on Restart, but the path must exist where the mission
+runs. Write the path with forward slashes: a backslash in the Python string is an escape. Embed what you
+hand over; load from disk while developing.
+
 Map metres: `x` north, `y` east; headings in radians from north. `M.embedFile` reads a relative
 path from the recipe's folder. The build refuses duplicate ids or unit names, unknown unit types,
 a country id that does not match its name, and triggers naming missing files.
@@ -56,6 +63,10 @@ The tables are dicts: a Lua array is a dict keyed `1..n`, and a number read from
 `luatable.Num` (text; `luatable.num()` gives its value). The helpers take lists; to put a list
 into a table yourself, convert it with `luatable.lua()`. Only the tables the recipe changes are
 rewritten, in the template's own layout; everything else is copied unchanged.
+
+`reference.md`, next to this file: the files inside a `.miz`, how triggers are stored, Game Master
+roles, air-start and payload fields. Read it before editing a table directly, writing a trigger
+other than MISSION START, or placing an aircraft in the air.
 
 The group table `M.addGroup` writes is also the one `coalition.addGroup` takes at runtime: see
 `writing-dcs-scripts`.
@@ -90,7 +101,7 @@ No file holds trees or buildings. In order of preference:
 
 | Mistake | Effect | Instead |
 |---|---|---|
-| Attack task on the first waypoint of an air-started group | not flown | put it on waypoint 2 (`route[1].tasks`) |
+| Attack task on the first waypoint of an air-started group | ignored: see `writing-dcs-scripts` | put it on waypoint 2 (`route[1].tasks`) |
 | Unit type, CLSID or task field from memory | ME drops the unit or task silently | read it from the sources above |
 | Ground units on a guessed spot | units in a forest or on a slope | a flown spot, or `placement-check` |
 | `weaponType = 2032` for iron bombs | any bomb | 240 iron, 14 guided (`weaponTable`) |
