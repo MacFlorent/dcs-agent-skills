@@ -25,8 +25,8 @@ Two halves that must agree, index for index:
 - `mission.trig` — what DCS runs: `actions[n]` and `conditions[n]` as Lua source, `flag[n] = true`,
   and `funcStartup[n]` (MISSION START) or `func[n]` (the others) calling them.
 
-`M.onStart` writes both for a MISSION START trigger. For another kind, copy one from a shipped
-mission (`miz.py find '"triggerOnce"'`).
+`M.onStart` writes both for a MISSION START trigger. For another kind, copy one from a mission
+that comes with DCS (`miz.py find '"triggerOnce"'`).
 
 ## Game Master
 

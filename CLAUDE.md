@@ -10,12 +10,12 @@ loaded.
 ## Never
 
 - **Mention dcs-hotload, or any other way of running Lua in a live mission, under `plugins/`.**
-  Skills describe DCS; the agent brings its own runner. CI fails on the word `hotload`.
+  Skills describe DCS; the agent brings its own runner.
 - **Put a fact in two skills.** Each fact has one home; other skills point to it by skill name.
 - **Write a unit type, CLSID, task field or flag from memory** into a skill or an example: read it
   from the DCS install or the Hoggit wiki.
-- **Add project findings** (one test series, one library such as Skynet) to a skill: only what is
-  true of DCS for any mission belongs here.
+- **Add to a skill what holds only for one mission or one external script**: a finding belongs
+  here when it is true of DCS for any mission, wherever it was found.
 - **Set `version`** in `plugin.json` or `marketplace.json` for a plugin of this repository.
 - **Commit directly to `main`**, except a change confined to `.tracker/`. Branch as `<type>/<slug>`.
 - **Merge a pull request** unless asked to.
@@ -23,8 +23,8 @@ loaded.
 ## Commands
 
 ```
-claude plugin validate .                # the marketplace and each plugin, as CI runs it
-python -m unittest discover -s test     # the skills' scripts, as CI runs them
+claude plugin validate .                # validate the marketplace and each plugin, as CI runs it
+python -m unittest discover -s test     # test the skills' scripts, as CI runs them
 bash scripts/lint.sh                    # luacheck at its pinned version, as CI runs it
 ```
 

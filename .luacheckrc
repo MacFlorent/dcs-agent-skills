@@ -2,7 +2,7 @@
 std = "lua51"
 max_line_length = 120
 
--- test/fixtures/ keeps the Lua recipes the golden missions were built from, and stand-in scripts.
+-- test/fixtures/ keeps the stand-in scripts the test missions embed.
 exclude_files = { "test/fixtures/**" }
 
 -- Runs inside a DCS mission.

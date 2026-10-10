@@ -158,16 +158,18 @@ class ShippedMissions(unittest.TestCase):
 
 # ── Recipes ─────────────────────────────────────────────────────────────────────────────────────
 
-class GoldenBuilds(Scratch):
-    """Recipes built by the former Lua path (mizedit.lua), kept as fixtures: same tables now."""
+class ReferenceBuilds(Scratch):
+    """Each fixture's recipe.py builds the same tables as its expected.miz. Not checked in DCS.
+    When a helper changes on purpose, rebuild it:
+    miz.py build templates/caucasus.miz recipe.py expected.miz."""
 
     def check(self, fixture):
         out = self.build(FIXTURES / fixture / "recipe.py")
-        golden = FIXTURES / fixture / "lua-built.miz"
+        reference = FIXTURES / fixture / "expected.miz"
         for entry in ("mission", "l10n/DEFAULT/mapResource"):
             with self.subTest(entry=entry):
-                self.assertEqual(normal(table(out, entry)), normal(table(golden, entry)))
-        built, expected = entries(out), entries(golden)
+                self.assertEqual(normal(table(out, entry)), normal(table(reference, entry)))
+        built, expected = entries(out), entries(reference)
         self.assertEqual(sorted(built), sorted(expected))
         for name in expected:
             if name.endswith(".lua"):
