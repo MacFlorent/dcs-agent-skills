@@ -38,12 +38,9 @@ claude --plugin-dir plugins/dcs-missions      # a session with the working tree'
 ```
 
 After changing the `.miz` reader or writer, also run the round trip over every mission that comes
-with DCS World: it reads them from a local DCS install (`DCS_INSTALL`, or the usual places) and
-takes about a minute and a half, so it runs only on request:
-
-```
-DCS_AGENT_SKILLS_TEST_SHIPPED_MISSIONS=1 python -m unittest discover -s test
-```
+with DCS World. It takes about a minute and a half, so it runs only when `test/dcs-install.txt`
+names your DCS install: copy `test/dcs-install.example.txt` to it and follow its comment. The copy
+is git-ignored; comment its line out to skip the round trip again. Then run the tests as above.
 
 ## Writing skills
 

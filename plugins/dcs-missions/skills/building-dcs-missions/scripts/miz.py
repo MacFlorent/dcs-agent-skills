@@ -1,14 +1,14 @@
 """miz.py -- build, unpack and pack DCS .miz files. Python 3 standard library only.
 
-  python miz.py build TEMPLATE.miz RECIPE.py OUT.miz [--dcs DCS_INSTALL]
+  python miz.py build TEMPLATE.miz RECIPE.py OUT.miz --dcs INSTALL
       Run the Python RECIPE on TEMPLATE's tables (mizedit.py, next to this file), check every
       unit type and country against the DCS install, write OUT. Nothing is written when a check
       fails. Only the tables the recipe changed are rewritten; the rest of TEMPLATE is copied.
-  python miz.py find TEXT [--lines N] [--max M] [--dcs DCS_INSTALL]
+  python miz.py find TEXT [--lines N] [--max M] --dcs INSTALL
       List the missions shipped with DCS whose `mission` table contains TEXT (a unit type, a task
       id such as "SetInvisible", a field name), with the matching line and the N lines after it:
       known-good examples written by the Mission Editor.
-  python miz.py countries [--dcs DCS_INSTALL]
+  python miz.py countries --dcs INSTALL
       Country ids and names, numbered from Scripts/Database/db_countries.lua the way DCS does
       (one id per country:add, in order; country:next() skips one).
   python miz.py unpack IN.miz DIR
@@ -17,11 +17,10 @@
 A .miz is a zip of Lua tables: mission, options, warehouses, theatre, l10n/DEFAULT/dictionary,
 l10n/DEFAULT/mapResource, plus embedded files under l10n/DEFAULT/.
 
-The DCS install is --dcs, else the DCS_INSTALL environment variable, else the first of the usual
-locations that exists.
+INSTALL is the DCS World folder, the one holding Scripts/Database. The scripts never look for it:
+the caller passes it.
 """
 import argparse
-import os
 import re
 import sys
 import zipfile
@@ -32,8 +31,6 @@ import mizedit  # noqa: E402
 from luatable import FormatError  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
-DCS_CANDIDATES = [r"E:\DCS World", r"C:\Program Files\Eagle Dynamics\DCS World",
-                  r"D:\DCS World", r"C:\Program Files\Eagle Dynamics\DCS World OpenBeta"]
 COUNTRY_LINE = re.compile(
     r"""^country:next\(\)|^country:add\(\s*'[^']+'\s*,\s*_\("[^"]*"\)\s*,\s*"([^"]+)\"""", re.M)
 
@@ -51,16 +48,14 @@ def pack(folder, miz):
                 z.write(path, path.relative_to(folder).as_posix())
 
 
-def find_dcs(explicit):
-    explicit = explicit or os.environ.get("DCS_INSTALL")
-    for cand in ([explicit] if explicit else DCS_CANDIDATES):
-        if cand and (Path(cand) / "Scripts" / "Database").is_dir():
-            return Path(cand)
-    return None
+def is_dcs(path):
+    return (Path(path) / "Scripts" / "Database").is_dir()
 
 
-def need_dcs(explicit):
-    return find_dcs(explicit) or sys.exit("DCS install not found; pass --dcs or set DCS_INSTALL")
+def need_dcs(path):
+    if not is_dcs(path):
+        sys.exit(f"not a DCS install (no Scripts/Database): {path}")
+    return Path(path)
 
 
 def countries(dcs):
@@ -128,14 +123,11 @@ def build(args):
         b = mizedit.build(args.template, args.recipe)
     except (mizedit.RecipeError, FormatError) as e:
         sys.exit(str(e))
-    dcs = find_dcs(args.dcs)
-    if dcs is None:
-        print("WARNING: DCS install not found (--dcs); unit types and countries NOT checked")
-    else:
-        problems = check_units(b.units, known_types(dcs), countries(dcs))
-        if problems:
-            sys.exit("not written: " + "\n  ".join(problems))
-        print(f"unit types and countries checked against {dcs}")
+    dcs = need_dcs(args.dcs)
+    problems = check_units(b.units, known_types(dcs), countries(dcs))
+    if problems:
+        sys.exit("not written: " + "\n  ".join(problems))
+    print(f"unit types and countries checked against {dcs}")
     b.write(args.out)
     print(f"wrote {args.out}: {len(b.units)} units")
 
@@ -147,14 +139,14 @@ def main():
     b.add_argument("template")
     b.add_argument("recipe")
     b.add_argument("out")
-    b.add_argument("--dcs")
+    b.add_argument("--dcs", required=True)
     f = sub.add_parser("find")
     f.add_argument("text")
     f.add_argument("--lines", type=int, default=0)
     f.add_argument("--max", type=int, default=5)
-    f.add_argument("--dcs")
+    f.add_argument("--dcs", required=True)
     c = sub.add_parser("countries")
-    c.add_argument("--dcs")
+    c.add_argument("--dcs", required=True)
     u = sub.add_parser("unpack")
     u.add_argument("miz")
     u.add_argument("folder")

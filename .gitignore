@@ -4,5 +4,8 @@
 # Lint tools, fetched at pinned versions by scripts/lint.sh.
 /.tools/
 
+# Each contributor's DCS install, for the round trip over the shipped missions.
+/test/dcs-install.txt
+
 # Python bytecode from running the skills' scripts in place.
 __pycache__/

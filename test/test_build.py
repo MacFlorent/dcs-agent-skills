@@ -3,10 +3,9 @@
     python -m unittest discover -s test
 
 The round trip over every mission shipped with DCS takes about a minute and a half, so it runs only
-on request, with DCS_AGENT_SKILLS_TEST_SHIPPED_MISSIONS=1 and a DCS install found (DCS_INSTALL, or
-one of the usual places). Run it after changing the table reader or writer.
+when test/dcs-install.txt names a DCS install (a copy of test/dcs-install.example.txt). Run it
+after changing the table reader or writer.
 """
-import os
 import shutil
 import sys
 import tempfile
@@ -121,8 +120,17 @@ class TableFormat(unittest.TestCase):
             luatable.lua_load("mission = { [1] = some_function() }")
 
 
-@unittest.skipUnless(os.environ.get("DCS_AGENT_SKILLS_TEST_SHIPPED_MISSIONS") and miz.find_dcs(None),
-                     "set DCS_AGENT_SKILLS_TEST_SHIPPED_MISSIONS=1, with a DCS install found")
+def dcs_install():
+    """The first line of test/dcs-install.txt that is neither blank nor a # comment, else None."""
+    config = Path(__file__).resolve().parent / "dcs-install.txt"
+    lines = config.read_text(encoding="utf-8").splitlines() if config.is_file() else []
+    return next((s for s in map(str.strip, lines) if s and not s.startswith("#")), None)
+
+
+DCS_INSTALL = dcs_install()
+
+
+@unittest.skipUnless(DCS_INSTALL, "no DCS install in test/dcs-install.txt")
 class ShippedMissions(unittest.TestCase):
     """Every table a build may rewrite, in every mission DCS ships, reads and writes back unchanged.
 
@@ -131,7 +139,8 @@ class ShippedMissions(unittest.TestCase):
 
     def test_every_table_a_build_may_rewrite(self):
         failures, count, tables_seen, hand_edited = [], 0, 0, 0
-        for path in sorted(miz.find_dcs(None).rglob("*.miz")):
+        self.assertTrue(miz.is_dcs(DCS_INSTALL), f"test/dcs-install.txt: not a DCS install: {DCS_INSTALL}")
+        for path in sorted(Path(DCS_INSTALL).rglob("*.miz")):
             try:
                 tables = {n: d.decode("utf-8") for n, d in entries(path).items() if n in mizedit.TABLES.values()}
             except (zipfile.BadZipFile, UnicodeDecodeError, OSError):
@@ -161,7 +170,7 @@ class ShippedMissions(unittest.TestCase):
 class ReferenceBuilds(Scratch):
     """Each fixture's recipe.py builds the same tables as its expected.miz. Not checked in DCS.
     When a helper changes on purpose, rebuild it:
-    miz.py build templates/caucasus.miz recipe.py expected.miz."""
+    miz.py build templates/caucasus.miz recipe.py expected.miz --dcs DCS."""
 
     def check(self, fixture):
         out = self.build(FIXTURES / fixture / "recipe.py")
