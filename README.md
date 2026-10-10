@@ -17,9 +17,11 @@ the Hoggit wiki documents the scripting API. They do not run anything in DCS: to
 mission, the agent needs a way to run Lua there, which these skills leave to you: `dcs-hotload`,
 below, is one.
 
-The scripts of `building-dcs-missions` need **Python 3** only: recipes are Python, and the `.miz`
-is read and written without Lua, keeping what a recipe does not change as it was. They find the
-DCS install in its usual places, or through the `DCS_INSTALL` environment variable.
+`building-dcs-missions` builds a `.miz` from a template, an empty mission saved by the Mission
+Editor, and a recipe: a short Python script, written by the agent, that lists what to add or
+change (groups, payloads, triggers). Its scripts need **Python 3** only: the `.miz` is read and
+written without Lua, keeping what the recipe does not change as it was. They find the DCS install
+in its usual places; elsewhere, set a `DCS_INSTALL` environment variable to its folder.
 
 ### dcs-hotload
 
