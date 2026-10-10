@@ -9,7 +9,7 @@ runs inside them, loaded when a task calls for it. Published as a Claude Code pl
 
 | Skill | Loads when the agent… |
 |---|---|
-| `building-dcs-missions` | creates or edits a `.miz` without the Mission Editor: groups, payloads, triggers, embedded scripts, where to put ground units |
+| `building-dcs-missions` | builds or edits a mission (`.miz`): groups, payloads, triggers, embedded scripts, where to put ground units |
 | `writing-dcs-scripts` | writes Lua that runs in a mission: spawning, tasking, options, events, timers, observing weapons |
 
 The skills read names and formats from your DCS install rather than from memory, and say where
