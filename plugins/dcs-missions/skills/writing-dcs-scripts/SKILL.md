@@ -59,6 +59,10 @@ the wiki for flags, and check `unit:getAmmo()` after spawning.
   timeouts included.
 - Keep the id `timer.scheduleFunction` returns, and `timer.removeFunction` it when the work it
   guards ends another way.
+- **Arm timers from the mission's main Lua state, never from a coroutine.** A timer armed inside a
+  coroutine, directly or through a library, is called back on that coroutine; once the coroutine
+  has been garbage-collected, its next firing crashes DCS (an access violation in `lua.dll`, DCS
+  2.9.30).
 
 ## The environment
 
@@ -76,7 +80,8 @@ the wiki for flags, and check `unit:getAmmo()` after spawning.
 ## Measured behaviour
 
 `facts.md`, next to this file: what the wiki does not say, measured in DCS — observing a munition
-in flight, how ground units rearm. Read it before measuring weapons or engagements.
+in flight, weapon descriptors, what radars report, how ground units rearm, what AI attackers will
+not do. Read it before measuring weapons or engagements.
 
 ## Checking ground for a unit
 
