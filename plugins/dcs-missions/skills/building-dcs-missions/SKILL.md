@@ -29,7 +29,8 @@ it as `Path` under the registry key `HKCU\Software\Eagle Dynamics\DCS World` (se
 **Template**: a mission saved empty by the Mission Editor on the right map. `templates/` holds
 `caucasus.miz` (saved by DCS 2.9.30). Another map needs its own: `warehouses` lists that map's
 airfields, so a template cannot be relabelled. Ask the user to save an empty mission on that map
-(New, pick the map, Save) and use it as the template.
+(New, pick the map, Save) and use it as the template. A mission the user has edited by hand is
+rebuilt with that mission as the template, so their edits are kept.
 
 **Recipe**: a Python file, run with the mission's tables as globals (`mission`, `options`,
 `warehouses`, `dictionary`, `mapResource`) and the helpers as `M` (in `scripts/mizedit.py`,
